@@ -1,0 +1,152 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  # ── Frontend build (shared artifact) ────────────────────────────────────────
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: unlock_tool/package-lock.json
+      - run: npm ci
+        working-directory: unlock_tool
+      - run: npm run build
+        working-directory: unlock_tool
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: unlock_tool/dist/
+          retention-days: 1
+
+  # ── Linux binary ─────────────────────────────────────────────────────────────
+  linux:
+    needs: frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: unlock_tool/requirements.txt
+      - name: Install system deps
+        run: sudo apt-get update && sudo apt-get install -y libusb-1.0-0-dev
+      - name: Install Python deps
+        working-directory: unlock_tool
+        run: pip install -r requirements.txt pyinstaller==6.11.1
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: unlock_tool/dist/
+      - name: Build
+        working-directory: unlock_tool
+        run: pyinstaller build.spec --noconfirm --clean
+      - name: Package
+        working-directory: unlock_tool/dist
+        run: |
+          TAG="${{ github.ref_name }}"
+          tar -czf android-servicing-tool-${TAG}-linux-x86_64.tar.gz unlock_tool/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: unlock_tool/dist/*.tar.gz
+
+  # ── Windows binary ───────────────────────────────────────────────────────────
+  windows:
+    needs: frontend
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: unlock_tool/requirements.txt
+      - name: Install Python deps
+        working-directory: unlock_tool
+        run: pip install -r requirements.txt pyinstaller==6.11.1
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: unlock_tool/dist/
+      - name: Build
+        working-directory: unlock_tool
+        run: pyinstaller build_windows.spec --noconfirm --clean
+      - name: Package
+        working-directory: unlock_tool/dist
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          Compress-Archive -Path unlock_tool -DestinationPath "android-servicing-tool-${tag}-windows-x86_64.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: unlock_tool/dist/*.zip
+
+  # ── Android APK ──────────────────────────────────────────────────────────────
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Build APK
+        working-directory: unlock_tool/android_admin_apk
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+      - name: Locate APK
+        id: apk
+        run: |
+          APK=$(find unlock_tool/android_admin_apk/build -name "*.apk" | head -1)
+          echo "path=$APK" >> $GITHUB_OUTPUT
+      - name: Rename APK
+        run: |
+          TAG="${{ github.ref_name }}"
+          cp "${{ steps.apk.outputs.path }}" \
+             "android-servicing-tool-${TAG}.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk-release
+          path: android-servicing-tool-*.apk
+
+  # ── GitHub Release (tags only) ───────────────────────────────────────────────
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [linux, windows, apk]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-release
+          path: artifacts/
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-release
+          path: artifacts/
+      - uses: actions/download-artifact@v4
+        with:
+          name: apk-release
+          path: artifacts/
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Android Servicing Tool ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: artifacts/*
