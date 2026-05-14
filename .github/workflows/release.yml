@@ -70,7 +70,7 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.ref_name }}"
-          Compress-Archive -Path unlock_tool\dist\unlock_tool -DestinationPath "android-servicing-tool-${tag}-windows-x86_64.zip"
+          Compress-Archive -Path unlock_tool\dist\unlock_tool.exe -DestinationPath "android-servicing-tool-${tag}-windows-x86_64.zip"
 
       - uses: actions/upload-artifact@v4
         with:
