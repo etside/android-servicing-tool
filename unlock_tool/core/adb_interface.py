@@ -151,12 +151,15 @@ class ADBInterface:
 
         # Skip header
         for line in lines[1:]:
-            if line.strip() and '\t' in line:
-                serial, state = line.split('\t', 1)
-                devices.append({
-                    "serial": serial,
-                    "state": state
-                })
+            line = line.strip()
+            if not line:
+                continue
+            # adb devices output: "<serial>\t<state>"  or "<serial> <state>"
+            parts = line.split()
+            if len(parts) >= 2:
+                serial = parts[0]
+                state  = parts[-1]   # last token is always the state
+                devices.append({"serial": serial, "state": state})
 
         self.logger.info(f"Found {len(devices)} ADB devices")
         return devices

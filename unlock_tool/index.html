@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eTool v2.2.0 - Mobile Device Unlock Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #45a049;
+        }
+        .button.danger {
+            background: #f44336;
+        }
+        .button.danger:hover {
+            background: #da190b;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .device-list {
+            margin-top: 20px;
+        }
+        .device-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin: 5px 0;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>eTool v2.2.0</h1>
+        <p>Mobile Device Unlock Tool - Standalone Edition</p>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>Device Detection</h2>
+            <button class="button" onclick="detectDevices()">Detect Devices</button>
+            <button class="button" onclick="listDevices()">List Devices</button>
+            <div id="deviceStatus" class="status" style="display: none;"></div>
+            <div id="deviceList" class="device-list"></div>
+        </div>
+
+        <div class="card">
+            <h2>Device Operations</h2>
+            <div>
+                <input type="text" id="deviceSerial" placeholder="Device Serial" style="padding: 8px; margin: 5px; width: 200px;">
+                <button class="button" onclick="getDeviceInfo()">Get Device Info</button>
+            </div>
+            <div id="deviceInfo" style="margin-top: 20px; padding: 10px; background: #f9f9f9; border-radius: 5px; display: none;"></div>
+        </div>
+
+        <div class="card">
+            <h2>Unlock Operations</h2>
+            <p>Available operations will be listed here based on detected device.</p>
+            <button class="button" disabled>FRP Bypass</button>
+            <button class="button" disabled>Bootloader Unlock</button>
+            <button class="button" disabled>IMEI Repair</button>
+        </div>
+
+        <div class="card">
+            <h2>System Status</h2>
+            <div id="systemStatus">Checking system status...</div>
+            <button class="button" onclick="checkHealth()">Refresh Status</button>
+        </div>
+    </div>
+
+    <script>
+        async function apiCall(endpoint) {
+            try {
+                const response = await fetch(`/api/${endpoint}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('API call failed:', error);
+                return { error: error.message };
+            }
+        }
+
+        async function detectDevices() {
+            const status = document.getElementById('deviceStatus');
+            status.style.display = 'block';
+            status.className = 'status';
+            status.textContent = 'Detecting devices...';
+
+            const result = await apiCall('devices');
+            if (result.error) {
+                status.className = 'status error';
+                status.textContent = 'Error: ' + result.error;
+            } else {
+                status.className = 'status success';
+                status.textContent = 'Device detection completed';
+                displayDevices(result);
+            }
+        }
+
+        async function listDevices() {
+            await detectDevices();
+        }
+
+        function displayDevices(data) {
+            const deviceList = document.getElementById('deviceList');
+            deviceList.innerHTML = '';
+
+            const allDevices = [
+                ...data.connected.map(d => ({ ...d, type: 'connected' })),
+                ...data.adb.map(d => ({ ...d, type: 'adb' })),
+                ...data.fastboot.map(d => ({ ...d, type: 'fastboot' }))
+            ];
+
+            if (allDevices.length === 0) {
+                deviceList.innerHTML = '<p>No devices detected</p>';
+                return;
+            }
+
+            allDevices.forEach(device => {
+                const deviceDiv = document.createElement('div');
+                deviceDiv.className = 'device-item';
+                deviceDiv.innerHTML = `
+                    <strong>${device.serial || 'Unknown'}</strong> (${device.type})
+                    ${device.state ? `- ${device.state}` : ''}
+                `;
+                deviceList.appendChild(deviceDiv);
+            });
+        }
+
+        async function getDeviceInfo() {
+            const serial = document.getElementById('deviceSerial').value;
+            if (!serial) {
+                alert('Please enter a device serial');
+                return;
+            }
+
+            const infoDiv = document.getElementById('deviceInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.innerHTML = 'Loading device info...';
+
+            const result = await apiCall(`devices/${serial}`);
+            if (result.error) {
+                infoDiv.innerHTML = '<span style="color: red;">Error: ' + result.error + '</span>';
+            } else {
+                let html = `<h3>Device: ${result.serial}</h3>`;
+                html += `<p><strong>Platform:</strong> ${result.platform}</p>`;
+                if (result.properties) {
+                    html += '<h4>Properties:</h4><ul>';
+                    Object.entries(result.properties).slice(0, 10).forEach(([key, value]) => {
+                        html += `<li><strong>${key}:</strong> ${value}</li>`;
+                    });
+                    html += '</ul>';
+                }
+                infoDiv.innerHTML = html;
+            }
+        }
+
+        async function checkHealth() {
+            const statusDiv = document.getElementById('systemStatus');
+            statusDiv.textContent = 'Checking...';
+
+            const result = await apiCall('health');
+            if (result.error) {
+                statusDiv.innerHTML = '<span style="color: red;">Error: ' + result.error + '</span>';
+            } else {
+                statusDiv.innerHTML = `
+                    <span style="color: green;">✓ System OK</span><br>
+                    Version: ${result.version}<br>
+                    Status: ${result.status}
+                `;
+            }
+        }
+
+        // Check health on page load
+        window.onload = checkHealth;
+    </script>
+</body>
+</html>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
