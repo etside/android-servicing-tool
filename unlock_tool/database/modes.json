@@ -1,0 +1,132 @@
+{
+  "adb": {
+    "name": "ADB (Android Debug Bridge)",
+    "description": "Default mode for debugging and basic operations",
+    "required_for": ["frp_bypass", "screen_lock_remove", "adb_shell_operations", "backup_restore", "signature_bypass", "payload_extract"],
+    "setup_steps": [
+      "1. Enable Developer Options: Settings > About Phone > tap Build Number 7 times",
+      "2. Enable USB Debugging: Settings > Developer Options > USB Debugging",
+      "3. Connect device to computer via USB cable",
+      "4. Allow USB Debugging permission on device",
+      "5. Tool will auto-detect device"
+    ],
+    "troubleshooting": [
+      "Device not detected: Try different USB port or cable",
+      "Permission denied: Reconnect device and tap 'Allow' again",
+      "Offline: Restart ADB server or unplug/replug device"
+    ]
+  },
+  "fastboot": {
+    "name": "Fastboot",
+    "description": "Used for bootloader operations and firmware flashing",
+    "required_for": ["bootloader_unlock", "bootloader_relock", "firmware_flash", "secure_boot_disable"],
+    "setup_steps": [
+      "1. Enable Developer Options: Settings > About Phone > tap Build Number 7 times",
+      "2. Enable OEM Unlock: Settings > Developer Options > OEM Unlock (if available)",
+      "3. Boot into Fastboot mode:",
+      "   - Android 5-10: Hold Volume Down + Power, select 'Fastboot'",
+      "   - Android 11+: Hold Volume Down + Power until boot menu appears",
+      "4. Connect USB cable while in Fastboot",
+      "5. Tool will auto-detect device in Fastboot mode"
+    ],
+    "troubleshooting": [
+      "Device not detected: Try different USB port or install Fastboot drivers",
+      "Permission denied: May need root/admin privileges",
+      "Bootloader already unlocked: Can proceed directly to flashing"
+    ]
+  },
+  "recovery": {
+    "name": "Recovery Mode",
+    "description": "Used for sideloading and system recovery operations",
+    "required_for": ["sideload_recovery", "factory_reset_recovery", "stock_rom_flash"],
+    "setup_steps": [
+      "1. Enable Developer Options and USB Debugging",
+      "2. Boot into Recovery mode:",
+      "   - Most devices: Hold Volume Up + Power",
+      "   - Some Samsung: Hold Volume Up + Home + Power",
+      "   - Pixel: adb reboot recovery (from ADB mode)",
+      "3. Connect USB cable",
+      "4. Select 'Sideload' or 'Apply update from ADB' in recovery menu",
+      "5. Tool will auto-detect device"
+    ],
+    "troubleshooting": [
+      "Wrong recovery menu: Try different key combination",
+      "Permission denied: Ensure USB Debugging was enabled before boot",
+      "Can't mount partitions: Try factory reset or recovery reflash"
+    ]
+  },
+  "edl": {
+    "name": "EDL Mode (9008)",
+    "description": "Qualcomm Download Mode - lowest level access, can unbrick devices",
+    "required_for": ["qualcomm_firmware_flash", "full_device_unbrick", "secure_boot_bypass"],
+    "setup_steps": [
+      "1. Enable Developer Options and USB Debugging",
+      "2. Boot into Download Mode (varies by device):",
+      "   - Most Qualcomm: adb reboot edl (from ADB)",
+      "   - Some devices: Hold Volume Down + Power during boot",
+      "   - Some Xiaomi: Hold Volume Down + Power for 30+ seconds",
+      "3. Device will show 'Qualcomm HS-USB QDLoader 9008' in Windows Device Manager",
+      "4. Connect USB cable and install Qualcomm drivers if needed",
+      "5. Tool will auto-detect and can flash firmware"
+    ],
+    "troubleshooting": [
+      "Not appearing as 9008: Device may need driver installation",
+      "EDL command failed: Ensure EDL mode enabled in device settings",
+      "Stuck in EDL: Perform hard reset (hold power for 30 seconds)"
+    ]
+  },
+  "mediatek_meta": {
+    "name": "MediaTek META Mode",
+    "description": "MediaTek equivalent of Qualcomm EDL mode",
+    "required_for": ["mediatek_firmware_flash", "mediatek_nvram_repair"],
+    "setup_steps": [
+      "1. Enable Developer Options and USB Debugging",
+      "2. Boot into META mode (varies by device):",
+      "   - Most MediaTek: adb reboot meta (from ADB)",
+      "   - Some devices: Hold Volume Down + Power for 30 seconds",
+      "   - Alternative: Hold Volume Up + Home + Power",
+      "3. Device will appear as 'MediaTek Preloader' in Device Manager",
+      "4. Connect USB cable",
+      "5. Tool can now access NVRAM and flash firmware"
+    ],
+    "troubleshooting": [
+      "Device reboots to Android: Try different key combination",
+      "Not detected: Install MediaTek drivers",
+      "NVRAM locked: May need OTA tool or secondary method"
+    ]
+  },
+  "samsung_odin": {
+    "name": "Samsung Download Mode (Odin)",
+    "description": "Samsung's firmware flashing mode using Odin protocol",
+    "required_for": ["samsung_firmware_flash", "samsung_unbrick"],
+    "setup_steps": [
+      "1. Enable Developer Options and USB Debugging",
+      "2. Turn off device completely",
+      "3. Boot into Download Mode:",
+      "   - Hold Volume Down + Home + Power",
+      "   - Press Volume Up to confirm and enter mode",
+      "4. Device shows 'Odin Mode' or 'Download Mode' message",
+      "5. Connect USB cable",
+      "6. Tool will auto-detect device and can flash firmware"
+    ],
+    "troubleshooting": [
+      "Can't enter Download Mode: Try again, holding all buttons until Download Mode screen",
+      "Device detection failed: Install Samsung USB drivers",
+      "Checksum error: Firmware file may be corrupted or wrong model"
+    ]
+  },
+  "bootloader": {
+    "name": "Bootloader/Bootrom Mode",
+    "description": "Low-level bootloader access for vendor operations",
+    "required_for": ["secure_boot_disable", "bootloader_modifications"],
+    "setup_steps": [
+      "1. Device must be in Fastboot or EDL/META mode",
+      "2. Tool automatically provides bootloader access when appropriate",
+      "3. Operations performed by tool don't require manual mode switching"
+    ],
+    "troubleshooting": [
+      "Bootloader access denied: OEM unlock may be required first",
+      "Operation not supported: Device bootloader may not allow this"
+    ]
+  }
+}

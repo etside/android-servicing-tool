@@ -1,0 +1,30 @@
+END USER LICENSE AGREEMENT (EULA)
+
+IMPORTANT: READ CAREFULLY BEFORE USING THIS SOFTWARE.
+
+1. Authorization
+This tool is provided only for use on devices you own or have explicit permission to service.
+Unauthorized access, unlocking, or repair of devices without permission may violate local laws.
+
+2. No Warranty
+This software is provided "as is" without warranty of any kind. The developers and distributors disclaim all warranties,
+express or implied, including any warranty of merchantability, fitness for a particular purpose, or non-infringement.
+
+3. Risk Acknowledgement
+Using this tool may result in bricked devices, data loss, or unintended behavior.
+You accept all responsibility and agree that neither the developers nor any third party shall be liable for any damages.
+
+4. IMEI and Activation Operations
+IMEI repair, activation lock removal, and any network-related repairs may be illegal in some jurisdictions.
+You are responsible for understanding and complying with local laws before using these features.
+
+5. Licensing
+This tool requires a valid license before advanced features are enabled. License revocation checks may occur online.
+
+6. Export / Distribution
+Do not redistribute this tool or any generated licenses except through authorized channels.
+
+7. Updates and Support
+Software updates are provided at the user's discretion. The developers are not obligated to provide support.
+
+By using this product, you agree to these terms.

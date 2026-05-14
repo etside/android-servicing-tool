@@ -1,0 +1,112 @@
+{
+  "samsung_dm3q": {
+    "brand": "Samsung",
+    "model": "Galaxy S24 Ultra",
+    "codename": "dm3q",
+    "family": "samsung_galaxy",
+    "exploits": ["frp_bypass", "edl_mode", "diag_mode", "recovery_mode"],
+    "chipset": "Snapdragon 8 Gen 3",
+    "android_min": 14,
+    "android_max": 15,
+    "notes": "Latest flagship, Knox 5.0"
+  },
+  "samsung_sm3": {
+    "brand": "Samsung",
+    "model": "Galaxy S24+",
+    "codename": "sm3",
+    "family": "samsung_galaxy",
+    "exploits": ["frp_bypass", "edl_mode", "diag_mode", "recovery_mode"],
+    "chipset": "Snapdragon 8 Gen 3",
+    "android_min": 14,
+    "android_max": 15,
+    "notes": "Plus variant"
+  },
+  "samsung_crownqlte": {
+    "brand": "Samsung",
+    "model": "Galaxy S23 Ultra",
+    "codename": "crownqlte",
+    "family": "samsung_galaxy",
+    "exploits": ["frp_bypass", "edl_mode", "diag_mode", "recovery_mode"],
+    "chipset": "Snapdragon 8 Gen 2",
+    "android_min": 13,
+    "android_max": 14,
+    "notes": "Premium variant"
+  },
+  "xiaomi_apollo": {
+    "brand": "Xiaomi",
+    "model": "14 Ultra",
+    "codename": "apollo",
+    "family": "xiaomi",
+    "exploits": ["edl_mode", "fastboot_unlock", "frp_bypass"],
+    "chipset": "Snapdragon 8 Gen 3",
+    "android_min": 14,
+    "android_max": 15,
+    "notes": "Flagship, Mi Unlock support"
+  },
+  "google_caiman": {
+    "brand": "Google",
+    "model": "Pixel 9 Pro",
+    "codename": "caiman",
+    "family": "google_pixel",
+    "exploits": ["frp_bypass", "fastboot_unlock", "edl_mode"],
+    "chipset": "Tensor G4",
+    "android_min": 14,
+    "android_max": 15,
+    "notes": "Tensor devices"
+  },
+  "oneplus_phoenix": {
+    "brand": "OnePlus",
+    "model": "12",
+    "codename": "phoenix",
+    "family": "oneplus",
+    "exploits": ["fastboot_unlock", "frp_bypass", "edl_mode"],
+    "chipset": "Snapdragon 8 Gen 3",
+    "android_min": 14,
+    "android_max": 15,
+    "notes": "Open bootloader support"
+  },
+  "motorola_razr50": {
+    "brand": "Motorola",
+    "model": "Razr 50",
+    "codename": "guacamole",
+    "family": "motorola",
+    "exploits": ["frp_bypass", "recovery_mode", "adb_sideload"],
+    "chipset": "Snapdragon 7 Gen 3",
+    "android_min": 13,
+    "android_max": 14,
+    "notes": "Budget-friendly flagship"
+  },
+  "oppo_find_x8": {
+    "brand": "OPPO",
+    "model": "Find X8",
+    "codename": "pdx234",
+    "family": "oppo_realme",
+    "exploits": ["frp_bypass", "edl_mode"],
+    "chipset": "Snapdragon 8 Elite",
+    "android_min": 14,
+    "android_max": 15,
+    "notes": "Premium ColorOS device"
+  },
+  "realme_gt7": {
+    "brand": "Realme",
+    "model": "GT 7 Pro",
+    "codename": "psyche",
+    "family": "oppo_realme",
+    "exploits": ["frp_bypass", "edl_mode"],
+    "chipset": "Snapdragon 8 Elite",
+    "android_min": 14,
+    "android_max": 15,
+    "notes": "Gaming variant"
+  },
+  "vivo_x200": {
+    "brand": "Vivo",
+    "model": "X200",
+    "codename": "V2401",
+    "family": "vivo_iqoo",
+    "exploits": ["frp_bypass", "recovery_mode"],
+    "chipset": "MediaTek Dimensity 9300",
+    "android_min": 14,
+    "android_max": 15,
+    "notes": "Premium MediaTek device"
+  }
+}

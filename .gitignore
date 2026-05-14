@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.build_venv/
+build_venv/
+pyinstaller_env/
+*.egg-info/
+
+# Build output
+build/
+dist/
+*.tar.gz
+*.zip
+*.exe
+
+# Android build
+android_admin_apk/build/
+android_admin_apk/.gradle/
+*.apk
+*.aab
+*.idsig
+
+# Node
+node_modules/
+.vite/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Secrets / licenses
+license.bin
+*.key
+*.pem
+
+# Logs
+*.log

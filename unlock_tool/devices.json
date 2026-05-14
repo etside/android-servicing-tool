@@ -1,0 +1,53 @@
+{
+  "android": {
+    "vendors": [
+      {"vid": "18d1", "pid": "4ee0", "mode": "adb", "brand": "Google"},
+      {"vid": "18d1", "pid": "d00d", "mode": "fastboot", "brand": "Google"},
+      {"vid": "18d1", "pid": "2d00", "mode": "adb", "brand": "Google"},
+      {"vid": "05c6", "pid": "9008", "mode": "qualcomm_edl", "brand": "Qualcomm"},
+      {"vid": "05c6", "pid": "any", "mode": "qualcomm_edl", "brand": "Qualcomm"},
+      {"vid": "0e8d", "pid": "0003", "mode": "mediatek_preloader", "brand": "MediaTek"},
+      {"vid": "0e8d", "pid": "2000", "mode": "mediatek_brom", "brand": "MediaTek"},
+      {"vid": "04e8", "pid": "6860", "mode": "samsung_adb", "brand": "Samsung"},
+      {"vid": "04e8", "pid": "685d", "mode": "samsung_fastboot", "brand": "Samsung"},
+      {"vid": "04e8", "pid": "685b", "mode": "samsung_download", "brand": "Samsung"},
+      {"vid": "2a70", "pid": "4ee0", "mode": "oneplus_adb", "brand": "OnePlus"},
+      {"vid": "2a70", "pid": "4ee2", "mode": "oneplus_fastboot", "brand": "OnePlus"},
+      {"vid": "2a70", "pid": "4ee4", "mode": "oneplus_edl", "brand": "OnePlus"},
+      {"vid": "2717", "pid": "4ee0", "mode": "xiaomi_adb", "brand": "Xiaomi"},
+      {"vid": "2717", "pid": "4ee2", "mode": "xiaomi_fastboot", "brand": "Xiaomi"},
+      {"vid": "2717", "pid": "4ee4", "mode": "xiaomi_edl", "brand": "Xiaomi"},
+      {"vid": "12d1", "pid": "107e", "mode": "huawei_adb", "brand": "Huawei"},
+      {"vid": "12d1", "pid": "107d", "mode": "huawei_fastboot", "brand": "Huawei"},
+      {"vid": "22b8", "pid": "any", "mode": "motorola_adb", "brand": "Motorola"},
+      {"vid": "22b8", "pid": "any", "mode": "motorola_fastboot", "brand": "Motorola"},
+      {"vid": "22b8", "pid": "2e76", "mode": "motorola_fastboot", "brand": "Motorola"},
+      {"vid": "0b05", "pid": "1857", "mode": "asus_adb", "brand": "Asus"},
+      {"vid": "0b05", "pid": "18d1", "mode": "asus_fastboot", "brand": "Asus"},
+      {"vid": "2207", "pid": "any", "mode": "zte_adb", "brand": "ZTE"},
+      {"vid": "2207", "pid": "any", "mode": "zte_fastboot", "brand": "ZTE"},
+      {"vid": "054c", "pid": "05ba", "mode": "sony_fastboot", "brand": "Sony"},
+      {"vid": "054c", "pid": "0ce6", "mode": "sony_adb", "brand": "Sony"},
+      {"vid": "1004", "pid": "any", "mode": "lg_adb", "brand": "LG"},
+      {"vid": "1004", "pid": "any", "mode": "lg_fastboot", "brand": "LG"},
+      {"vid": "22d9", "pid": "any", "mode": "oppo_adb", "brand": "Oppo"},
+      {"vid": "22d9", "pid": "any", "mode": "realme_adb", "brand": "Realme"},
+      {"vid": "22d9", "pid": "any", "mode": "vivo_adb", "brand": "Vivo"},
+      {"vid": "22d9", "pid": "any", "mode": "iqoo_adb", "brand": "iQOO"},
+      {"vid": "27c6", "pid": "any", "mode": "vivo_adb", "brand": "Vivo"},
+      {"vid": "2a96", "pid": "any", "mode": "itel_adb", "brand": "Itel"},
+      {"vid": "1572", "pid": "any", "mode": "tecno_adb", "brand": "Tecno"},
+      {"vid": "0489", "pid": "any", "mode": "nokia_adb", "brand": "Nokia"},
+      {"vid": "05c6", "pid": "9008", "mode": "qualcomm_edl", "brand": "Nothing"},
+      {"vid": "05c6", "pid": "9008", "mode": "qualcomm_edl", "brand": "Realme"},
+      {"vid": "05c6", "pid": "9008", "mode": "qualcomm_edl", "brand": "Vivo"}
+    ]
+  },
+  "ios": {
+    "vendor_id": "05ac",
+    "normal": ["12a8", "12a9", "12aa", "12ab", "12ac", "12ad", "12ae", "12af"],
+    "recovery": ["1281", "1283", "1290"],
+    "dfu": ["1227", "1222"],
+    "platform": "ios"
+  }
+}

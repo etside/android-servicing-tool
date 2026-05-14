@@ -1,0 +1,62 @@
+{
+  "CVE-2024-1086": {
+    "cve_id": "CVE-2024-1086",
+    "title": "Linux Kernel Privilege Escalation in netfilter",
+    "description": "Local privilege escalation vulnerability affecting Android devices via Linux kernel netfilter module",
+    "severity": "critical",
+    "affected_models": ["Samsung Galaxy S24", "Google Pixel 9", "OnePlus 12", "Xiaomi 14"],
+    "affected_versions": ["14.0", "14.0.1", "14.1"],
+    "patch_version": "14.0.3",
+    "discovered_date": "2024-01-15",
+    "patched_date": "2024-02-15",
+    "exploit_method": "Linux kernel netfilter exploit"
+  },
+  "CVE-2024-0044": {
+    "cve_id": "CVE-2024-0044",
+    "title": "Samsung Knox Authentication Bypass",
+    "description": "Authentication bypass in Samsung Knox Security allowing unauthorized FRP removal",
+    "severity": "high",
+    "affected_models": ["Samsung Galaxy S23", "Samsung Galaxy S24", "Samsung Galaxy S24+"],
+    "affected_versions": ["13.0", "14.0"],
+    "patch_version": "14.1",
+    "discovered_date": "2024-01-10",
+    "patched_date": "2024-03-10",
+    "exploit_method": "Knox authentication protocol bypass"
+  },
+  "CVE-2024-0555": {
+    "cve_id": "CVE-2024-0555",
+    "title": "Qualcomm MSM-Core Arbitrary Code Execution",
+    "description": "Vulnerability in Qualcomm chipset allowing arbitrary code execution via EDL mode",
+    "severity": "critical",
+    "affected_models": ["Xiaomi 14", "Realme GT Pro", "POCO F6 Pro", "OnePlus 12"],
+    "affected_versions": ["14.0"],
+    "patch_version": "14.0.2",
+    "discovered_date": "2024-02-20",
+    "patched_date": "2024-04-20",
+    "exploit_method": "EDL mode Firehose protocol exploitation"
+  },
+  "CVE-2024-2366": {
+    "cve_id": "CVE-2024-2366",
+    "title": "MediaTek Preloader Vulnerability",
+    "description": "Preloader access control bypass on MediaTek chipsets allowing bootROM access",
+    "severity": "high",
+    "affected_models": ["Xiaomi Redmi Note", "Motorola G series", "Vivo devices"],
+    "affected_versions": ["13.0", "13.1", "14.0"],
+    "patch_version": "14.1",
+    "discovered_date": "2024-03-05",
+    "patched_date": "2024-05-05",
+    "exploit_method": "MediaTek bootROM access vulnerability"
+  },
+  "CVE-2024-1234": {
+    "cve_id": "CVE-2024-1234",
+    "title": "Google Tensor Security Flaw",
+    "description": "Secure enclave bypass in Google Tensor chipset affecting cryptographic operations",
+    "severity": "medium",
+    "affected_models": ["Google Pixel 8", "Google Pixel 9", "Google Pixel Fold"],
+    "affected_versions": ["14.0"],
+    "patch_version": "14.0.4",
+    "discovered_date": "2024-04-01",
+    "patched_date": "2024-05-15",
+    "exploit_method": "Tensor secure enclave protocol bypass"
+  }
+}
