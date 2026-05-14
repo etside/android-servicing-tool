@@ -39,10 +39,10 @@ jobs:
           cache: pip
           cache-dependency-path: unlock_tool/requirements.txt
       - name: Install system deps
-        run: sudo apt-get update && sudo apt-get install -y libusb-1.0-0-dev
+        run: sudo apt-get update && sudo apt-get install -y libusb-1.0-0-dev libgl1
       - name: Install Python deps
         working-directory: unlock_tool
-        run: pip install -r requirements.txt pyinstaller==6.11.1
+        run: pip install -r requirements-ci.txt pyinstaller==6.11.1
       - uses: actions/download-artifact@v4
         with:
           name: frontend-dist
@@ -73,7 +73,7 @@ jobs:
           cache-dependency-path: unlock_tool/requirements.txt
       - name: Install Python deps
         working-directory: unlock_tool
-        run: pip install -r requirements.txt pyinstaller==6.11.1
+        run: pip install -r requirements-ci.txt pyinstaller==6.11.1
       - uses: actions/download-artifact@v4
         with:
           name: frontend-dist
@@ -102,9 +102,9 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Build APK
-        working-directory: unlock_tool/android_admin_apk
         run: |
-          chmod +x gradlew
+          chmod +x unlock_tool/android_admin_apk/gradlew
+          cd unlock_tool/android_admin_apk
           ./gradlew assembleRelease --no-daemon
       - name: Locate APK
         id: apk

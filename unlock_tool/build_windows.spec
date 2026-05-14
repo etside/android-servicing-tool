@@ -76,7 +76,6 @@ hidden_imports = [
     'PyQt6.QtCore',
     'PyQt6.QtGui',
     'PyQt6.QtWidgets',
-]
     'modules.exploits.lockscreen_removal_exploit',
     'modules.exploits.imei_qcn_exploit',
 ]

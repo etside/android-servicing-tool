@@ -1,0 +1,17 @@
+PyQt6>=6.5.0
+pyusb>=1.3.0
+pyserial>=3.5
+libusb1>=3.0.0
+cryptography>=41.0.0
+pycryptodome>=3.23.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+colorama>=0.4.6
+tqdm>=4.65.0
+pyyaml>=6.0
+jsonschema>=4.17.0
+psutil>=5.9.0
+platformdirs>=3.8.0
+packaging>=23.1
+qrcode>=7.4.0
+passlib>=1.7.4
