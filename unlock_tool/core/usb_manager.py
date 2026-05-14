@@ -62,33 +62,94 @@ class USBDevice:
 
 
 KNOWN_MODES = {
-    (0x18d1, 0xd00d): "fastboot",
+    # Google / AOSP
     (0x18d1, 0x4ee0): "adb",
-    (0x05c6, 0x9008): "qualcomm_edl",
-    (0x0e8d, 0x0003): "mediatek_preloader",
-    (0x0e8d, 0x2000): "mediatek_brom",
+    (0x18d1, 0x4ee2): "fastboot",
+    (0x18d1, 0x4ee7): "adb",
+    (0x18d1, 0xd00d): "fastboot",
+    (0x18d1, 0x2d00): "mtp",
+    (0x18d1, 0x2d01): "ptp",
+    (0x18d1, 0x2d05): "mtp",
+    # Samsung
     (0x04e8, 0x6860): "samsung_adb",
     (0x04e8, 0x685d): "samsung_fastboot",
-    (0x2717, 0x4ee0): "xiaomi_adb",
-    (0x2717, 0x4ee2): "xiaomi_fastboot",
-    (0x2717, 0x4ee4): "xiaomi_edl",
+    (0x04e8, 0x685b): "samsung_download",   # Odin / Download Mode
+    (0x04e8, 0x685e): "samsung_adb",
+    (0x04e8, 0x6601): "mtp",
+    (0x04e8, 0x6602): "ptp",
+    # Qualcomm EDL
+    (0x05c6, 0x9008): "qualcomm_edl",
+    (0x05c6, 0x901d): "qualcomm_diag",
+    (0x05c6, 0x9025): "qualcomm_adb",
+    # MediaTek
+    (0x0e8d, 0x0003): "mediatek_preloader",
+    (0x0e8d, 0x2000): "mediatek_brom",
+    (0x0e8d, 0x2001): "mediatek_brom",
+    # OnePlus / Nothing
     (0x2a70, 0x4ee0): "oneplus_adb",
     (0x2a70, 0x4ee2): "oneplus_fastboot",
+    (0x2a70, 0x4ee4): "qualcomm_edl",
+    (0x2a70, 0x4ee7): "oneplus_adb",
+    (0x2a70, 0x0410): "oneplus_special",
+    # Xiaomi / Redmi / POCO
+    (0x2717, 0x4ee0): "xiaomi_adb",
+    (0x2717, 0x4ee2): "xiaomi_fastboot",
+    (0x2717, 0x4ee4): "qualcomm_edl",
+    (0x2717, 0x4ee7): "xiaomi_adb",
+    (0x2717, 0xff03): "xiaomi_adb",
+    (0x2717, 0xff48): "mtp",
+    (0x2717, 0xff40): "charging",
+    # Huawei / Honor
     (0x12d1, 0x107e): "huawei_adb",
     (0x12d1, 0x107d): "huawei_fastboot",
-    (0x1004, 0x633e): "lg_fastboot",
-    (0x1004, 0x633f): "lg_adb",
-    (0x0bb4, 0x0c02): "htc_fastboot",
-    (0x0bb4, 0x0c03): "htc_adb",
-    (0x2207, 0x0010): "zte_adb",
-    (0x19d2, 0x1405): "zte_fastboot",
+    (0x12d1, 0x1037): "mtp",
+    (0x12d1, 0x1038): "ptp",
+    (0x12d1, 0x3609): "huawei_hisuite",
+    # Motorola
+    (0x22b8, 0x2e76): "motorola_fastboot",
+    (0x22b8, 0x2e82): "mtp",
+    (0x22b8, 0x2d61): "motorola_adb",
+    # Asus
+    (0x0b05, 0x1857): "asus_adb",
+    (0x0b05, 0x18d1): "asus_fastboot",
+    (0x0b05, 0x1799): "mtp",
+    # Sony
     (0x054c, 0x05ba): "sony_fastboot",
     (0x054c, 0x0ce6): "sony_adb",
-    (0x0b05, 0x18d1): "asus_fastboot",
-    (0x0b05, 0x1857): "asus_adb",
-    (0x1d4d, 0x0003): "samsung_download",
-    (0x2a70, 0x0410): "oneplus_special",
-    (0x2717, 0xff03): "xiaomi_misc",
+    (0x054c, 0x0b5c): "mtp",
+    # LG
+    (0x1004, 0x633e): "lg_fastboot",
+    (0x1004, 0x633f): "lg_adb",
+    (0x1004, 0x61f1): "lg_adb",
+    # HTC
+    (0x0bb4, 0x0c02): "htc_fastboot",
+    (0x0bb4, 0x0c03): "htc_adb",
+    # ZTE
+    (0x2207, 0x0010): "zte_adb",
+    (0x19d2, 0x1405): "zte_fastboot",
+    # Oppo / Realme / Vivo / iQOO
+    (0x22d9, 0x2764): "oppo_adb",
+    (0x22d9, 0x2765): "oppo_fastboot",
+    # Nokia
+    (0x0489, 0xe00f): "nokia_adb",
+    (0x0489, 0xe00d): "nokia_fastboot",
+    # Tecno / Itel / Infinix
+    (0x1572, 0x0002): "tecno_adb",
+    (0x2a96, 0x0001): "itel_adb",
+    # Apple iOS
+    (0x05ac, 0x12a8): "ios_normal",
+    (0x05ac, 0x12a9): "ios_normal",
+    (0x05ac, 0x12aa): "ios_normal",
+    (0x05ac, 0x12ab): "ios_normal",
+    (0x05ac, 0x12ac): "ios_normal",
+    (0x05ac, 0x12ad): "ios_normal",
+    (0x05ac, 0x12ae): "ios_normal",
+    (0x05ac, 0x12af): "ios_normal",
+    (0x05ac, 0x1281): "ios_recovery",
+    (0x05ac, 0x1283): "ios_recovery",
+    (0x05ac, 0x1290): "ios_recovery",
+    (0x05ac, 0x1227): "ios_dfu",
+    (0x05ac, 0x1222): "ios_dfu",
 }
 
 

@@ -42,16 +42,18 @@ class DeviceDetector:
         preferred_mode = (preferred_mode or 'auto').strip().lower()
         self.logger.info(f"Detecting device, preferred_mode={preferred_mode}")
 
+        # Try preferred mode first
         if preferred_mode in ['ios', 'normal', 'recovery', 'dfu']:
             ios_info = self._detect_ios(preferred_mode)
             if ios_info:
                 return ios_info
 
-        if preferred_mode in ['adb', 'fastboot', 'recovery', 'qualcomm_edl', 'mediatek_preloader', 'mediatek_brom']:
+        if preferred_mode in ['adb', 'fastboot', 'recovery', 'qualcomm_edl', 'mediatek_preloader', 'mediatek_brom', 'samsung_download', 'charging']:
             android_info = self._detect_android(preferred_mode)
             if android_info:
                 return android_info
 
+        # Auto-detect all modes
         ios_info = self._detect_ios()
         if ios_info:
             return ios_info
@@ -64,19 +66,39 @@ class DeviceDetector:
         return None
 
     def _detect_android(self, preferred_mode: str = 'auto') -> Optional[Dict[str, Any]]:
-        if preferred_mode in ['adb', 'recovery', 'auto']:
+        # ADB transport modes (adb, recovery, sideload, charging/offline)
+        if preferred_mode in ['adb', 'recovery', 'sideload', 'charging', 'auto']:
             device = self._detect_via_adb()
             if device:
-                # Check if this matches the preferred mode
-                if preferred_mode == 'auto' or device.get('mode') == preferred_mode:
+                if preferred_mode == 'auto':
+                    return device
+                if device.get('mode') == preferred_mode:
+                    return device
+                if preferred_mode in ('adb', 'recovery', 'sideload', 'charging'):
                     return device
 
+        # Fastboot / bootloader mode
         if preferred_mode in ['fastboot', 'auto']:
             device = self._detect_via_fastboot()
             if device:
                 return device
 
-        if preferred_mode in ['qualcomm_edl', 'mediatek_preloader', 'mediatek_brom', 'auto']:
+        # USB-level detection: EDL, MTK BROM/Preloader, Samsung Download, charging, MTP
+        usb_modes = [
+            'qualcomm_edl', 'mediatek_preloader', 'mediatek_brom',
+            'samsung_download', 'charging', 'mtp', 'ptp',
+            'oneplus_adb', 'oneplus_fastboot', 'oneplus_edl',
+            'xiaomi_adb', 'xiaomi_fastboot', 'xiaomi_edl',
+            'samsung_adb', 'samsung_fastboot',
+            'huawei_adb', 'huawei_fastboot',
+            'motorola_adb', 'motorola_fastboot',
+            'asus_adb', 'asus_fastboot',
+            'sony_adb', 'sony_fastboot',
+            'lg_adb', 'lg_fastboot',
+            'oppo_adb', 'realme_adb', 'vivo_adb', 'iqoo_adb',
+            'itel_adb', 'tecno_adb', 'nokia_adb', 'zte_adb',
+        ]
+        if preferred_mode in usb_modes or preferred_mode == 'auto':
             device = self._detect_via_usb(preferred_mode)
             if device:
                 return device
@@ -100,39 +122,66 @@ class DeviceDetector:
             return None
 
         devices = self.adb_interface.get_devices()
+        STATE_MODE = {
+            'device':      'adb',
+            'recovery':    'recovery',
+            'sideload':    'sideload',
+            'offline':     'charging',
+            'unauthorized':'unauthorized',
+            'bootloader':  'fastboot',   # fastboot over ADB transport
+        }
         for device in devices:
-            if device.get('state') == 'device':
-                return self._get_device_info_adb(device['serial'])
+            state = device.get('state', '')
+            mode = STATE_MODE.get(state)
+            if not mode:
+                continue
+            if mode in ('charging', 'unauthorized'):
+                return {
+                    'serial': device['serial'],
+                    'platform': 'android',
+                    'detection_method': 'adb',
+                    'mode': mode,
+                    'model': 'Unknown' if mode == 'charging' else 'Unauthorized (allow USB debugging)',
+                }
+            info = self._get_device_info_adb(device['serial'])
+            if info:
+                info['mode'] = mode
+                return info
         return None
 
     def _get_device_info_adb(self, serial: str) -> Optional[Dict[str, Any]]:
-        result = self.adb_interface.run_command(['shell', 'getprop'], device=serial, timeout=10)
-        if result[0] != 0:
-            return None
-
         info = {
             'serial': serial,
             'platform': 'android',
             'detection_method': 'adb',
             'mode': 'adb'
         }
+        result = self.adb_interface.run_command(['shell', 'getprop'], device=serial, timeout=10)
+        if result[0] != 0:
+            # getprop failed (common in some recovery environments) — return minimal info
+            return info
+
         stdout = result[1]
         for line in stdout.splitlines():
             if ': [' not in line or ']' not in line:
                 continue
             key = line.split(': [')[0].strip()
             value = line.split(': [')[1].split(']')[0]
-            # Remove brackets from key if present
             if key.startswith('[') and key.endswith(']'):
                 key = key[1:-1]
             if key == 'ro.product.brand':
                 info['brand'] = value
+                info.setdefault('manufacturer', value)
+            elif key == 'ro.product.manufacturer':
+                info['manufacturer'] = value
+                info.setdefault('brand', value)
             elif key == 'ro.product.model':
                 info['model'] = value
             elif key == 'ro.product.device':
                 info['device'] = value
             elif key == 'ro.build.version.release':
                 info['version'] = value
+                info['android_version'] = value
             elif key == 'ro.build.type':
                 if value == 'recovery':
                     info['mode'] = 'recovery'
@@ -155,12 +204,34 @@ class DeviceDetector:
             'detection_method': 'fastboot',
             'mode': 'fastboot'
         }
-        try:
-            proc = subprocess.run(['fastboot', '-s', serial, 'getvar', 'product'], capture_output=True, text=True, timeout=10)
-            if proc.returncode == 0 and 'product:' in proc.stdout:
-                info['model'] = proc.stdout.split('product:')[1].strip()
-        except Exception:
-            pass
+        vars_to_get = [
+            ('product',      'model'),
+            ('serialno',     'serial_no'),
+            ('version',      'bootloader_version'),
+            ('secure',       'secure_boot'),
+            ('unlocked',     'bootloader_unlocked'),
+            ('variant',      'variant'),
+            ('hw-revision',  'hw_revision'),
+        ]
+        for var, key in vars_to_get:
+            try:
+                proc = subprocess.run(
+                    ['fastboot', '-s', serial, 'getvar', var],
+                    capture_output=True, text=True, timeout=5
+                )
+                # fastboot prints getvar output to stderr
+                output = proc.stderr + proc.stdout
+                for line in output.splitlines():
+                    if line.startswith(f'{var}:'):
+                        value = line.split(':', 1)[1].strip()
+                        if value:
+                            info[key] = value
+                        break
+            except Exception:
+                pass
+        # Derive brand from model if possible
+        if 'model' in info and 'brand' not in info:
+            info['brand'] = info['model'].split()[0] if info['model'] else 'Unknown'
         return info
 
     def _detect_via_usb(self, preferred_mode: str = 'auto') -> Optional[Dict[str, Any]]:
@@ -220,6 +291,20 @@ class DeviceDetector:
                 'protocol': usb_dev.protocol
             }
 
+        # Check KNOWN_MODES for charging/MTP PIDs not in devices.json
+        from .usb_manager import KNOWN_MODES
+        known_mode = KNOWN_MODES.get((usb_dev.vendor_id, usb_dev.product_id))
+        if known_mode:
+            return {
+                'platform': 'android',
+                'mode': known_mode,
+                'brand': self._brand_from_vendor_id(usb_dev.vendor_id),
+                'manufacturer': self._brand_from_vendor_id(usb_dev.vendor_id),
+                'serial': usb_dev.serial_number,
+                'vendor_id': f'{usb_dev.vendor_id:04x}',
+                'product_id': f'{usb_dev.product_id:04x}',
+            }
+
         return None
 
     def _brand_from_vendor_id(self, vendor_id: int) -> str:
@@ -244,6 +329,21 @@ class DeviceDetector:
         return vendors.get(vendor_id, 'Unknown')
 
     def _match_ios_device(self, usb_dev: USBDevice) -> Optional[Dict[str, Any]]:
+        # Fast path: protocol already resolved by KNOWN_MODES
+        if usb_dev.protocol and usb_dev.protocol.startswith('ios_'):
+            mode = usb_dev.protocol.replace('ios_', '')  # normal / recovery / dfu
+            return {
+                'platform': 'ios',
+                'mode': mode,
+                'brand': 'Apple',
+                'serial': usb_dev.serial_number,
+                'vendor_id': f'{usb_dev.vendor_id:04x}',
+                'product_id': f'{usb_dev.product_id:04x}',
+                'product': usb_dev.product,
+                'manufacturer': usb_dev.manufacturer,
+            }
+
+        # Fallback: match against ios database
         ios_db = self.database.get('ios', {})
         if not ios_db or usb_dev.vendor_id != int(ios_db.get('vendor_id', '0'), 16):
             return None
@@ -265,7 +365,7 @@ class DeviceDetector:
             'vendor_id': f'{usb_dev.vendor_id:04x}',
             'product_id': f'{usb_dev.product_id:04x}',
             'product': usb_dev.product,
-            'manufacturer': usb_dev.manufacturer
+            'manufacturer': usb_dev.manufacturer,
         }
 
     def get_device_security_info(self, device_info: Dict[str, Any]) -> Dict[str, Any]:
